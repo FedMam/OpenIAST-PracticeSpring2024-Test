@@ -1,0 +1,11 @@
+.type Class <: symbol
+
+.decl DirectSuperclass(this: Class, base: Class)
+.input DirectSuperclass(filename="DirectSuperclass.facts")
+.input DirectSuperclass(filename="DirectSuperinterface.facts")
+
+.decl SubClass(base: Class, this: Class)
+.output SubClass
+
+SubClass(base, this) :- DirectSuperclass(this, base).
+SubClass(base, this) :- SubClass(base, another), SubClass(another, this).

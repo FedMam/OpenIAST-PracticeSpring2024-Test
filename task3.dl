@@ -1,0 +1,40 @@
+/* Made with help of https://yanniss.github.io/points-to-tutorial15.pdf */
+
+.type Var <: symbol
+.type Obj <: symbol
+.type Field <: symbol
+.type Method <: symbol
+
+.decl Assign(a:Var, b:Var)
+.input Assign(filename="assign.facts")
+.decl New(v:Var, o:Obj, inM:Method)
+.input New(filename="new.facts")
+.decl Load(a:Var, b:Var, f:Field)
+.input Load(filename="load.facts")
+.decl Store(a:Var, f:Field, b:Var)
+.input Store(filename="store.facts")
+.decl Invokes(f: Method, t: Method)
+.input Invokes(filename="invokes.facts")
+.decl Entry(m: Method)
+.input Entry(filename="entry.facts")
+
+.decl Alias(a:Var, b:Var) 
+.output Alias
+
+Alias(X,X) :- Assign(X,_).
+Alias(X,X) :- Assign(_,X).
+
+Alias(X,Y) :- Assign(X,Y).
+Alias(X,Y) :- Load(X,A,F), Alias(A,B), Store(B,F,Y).
+
+.decl Reachable(m: Method)
+.output Reachable
+
+Reachable(M) :- Entry(M).
+Reachable(M) :- Reachable(N), Invokes(N,M).
+
+.decl PointsTo(a:Var, o:Obj)
+.output PointsTo
+
+PointsTo(X,Y) :- New(X,Y,M), Reachable(M).
+PointsTo(X,Y) :- Alias(X,Z), PointsTo(Z,Y).
